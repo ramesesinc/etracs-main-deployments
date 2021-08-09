@@ -9,7 +9,7 @@ app:
       readTimeout : 300000
       connectionTimeout : 5000
       "filemgmt.enabled" : false
-      "ws.host" : "${app_server_ip}:8060"
+      "#ws.host" : "${app_server_ip}:8060"
       "#res.host" : "${app_server_ip}"
       "socketio.host" : "${app_server_ip}:7080"
 
