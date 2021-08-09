@@ -22,6 +22,7 @@ services:
       - "8070:8070"
     volumes:
       - ./modules:/apps/etracs25/modules
+      - ./emptydir:/apps/notification
 
       - ../../_custom/datasources:/services/datasources
       - ../../_res/connections:/apps/etracs25/connections/ext
