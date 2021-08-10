@@ -2,7 +2,7 @@ version: "3"
 
 services:
 
-  epayment-server:
+  terminal-server:
     container_name: terminal-server
     image: ramesesinc/enterprise-common-server:255.05.001
     restart: always
