@@ -2,8 +2,8 @@ version: "3"
 
 services:
 
-  terminal-server:
-    container_name: terminal-server
+  ticketing-server:
+    container_name: ticketing-server
     image: ramesesinc/enterprise-common-server:255.05.001
     restart: always
     logging: 
@@ -18,13 +18,13 @@ services:
       - ../../_res/env.conf
       - ../../_custom/env.conf
     ports: 
-      - "8020:8070"
+      - "8075:8070"
     volumes:
       - ../../_res/connections:/enterprise/connections/ext
-      - ../../_custom/datasources/terminalds:/services/datasources/mainds
+      - ../../_custom/datasources/ticketingds:/services/datasources/mainds
 
       - ./server:/enterprise/modules
 
       - ./client/reports:/apps/server/templates
-      - ../../_custom/module-client/terminal:/apps/server/templates/custom
+      - ../../_custom/module-client/ticketing:/apps/server/templates/custom
       - ../../_custom/output:/apps/server/output
