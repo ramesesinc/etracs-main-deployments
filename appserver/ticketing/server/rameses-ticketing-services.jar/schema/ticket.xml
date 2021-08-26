@@ -1,6 +1,6 @@
 <schema>
 	<element tablename="ticket">
-		<field name="objid" primary="true" />
+		<field name="objid" primary="true" prefix="TKT"/>
 		<field name="seqno" required="true" caption="SeqNo" searchable="true" indexed="true"/>
 		<field name="barcode" required="true" caption="Barcode" searchable="true" indexed="true"/>
 		<field name="dtfiled" required="true" caption="DateFiled" indexed="true"/>

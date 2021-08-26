@@ -3,6 +3,7 @@ use v255_caticlan_terminal_go;
 
 -- ## 2021-08-20
 INSERT INTO `sys_role` (`name`, `title`, `system`) VALUES ('ADMIN', 'ADMIN', '1');
+INSERT INTO `sys_role` (`name`, `title`, `system`) VALUES ('COLLECTOR', 'COLLECTOR', '1');
 INSERT INTO `sys_role` (`name`, `title`, `system`) VALUES ('MASTER', 'MASTER', '1');
 INSERT INTO `sys_role` (`name`, `title`, `system`) VALUES ('SHARED', 'SHARED', '1');
 INSERT INTO `sys_role` (`name`, `title`, `system`) VALUES ('REPORT', 'REPORT', '1');
@@ -99,6 +100,67 @@ delete from v255_caticlan_go.sys_usergroup where domain='TERMINAL'
 ;
 
 
+create table ztmp_duplicate_sys_user_role 
+select t0.*, 
+	(
+		select objid from sys_user_role 
+		where role = t0.role and userid = t0.userid and ifnull(org_objid,'') = ifnull(t0.org_objid,'') 
+		limit 1 
+	) as userroleid 
+from ( 
+	select role, userid, org_objid, count(*) as icount 
+	from sys_user_role 
+	group by role, userid, org_objid
+	having count(*) > 1 
+)t0 
+; 
+
+create table ztmp_delete_duplicate_sys_user_role 
+select z.userroleid, r.* 
+from sys_user_role r, ztmp_duplicate_sys_user_role z 
+where r.role = z.role 
+	and r.userid = z.userid 
+	and ifnull(r.org_objid,'') = ifnull(z.org_objid,'')
+	and r.objid <> z.userroleid 
+;
+
+delete from sys_user_role where objid in (
+	select objid from ztmp_delete_duplicate_sys_user_role
+);
+
+drop table ztmp_delete_duplicate_sys_user_role; 
+drop table ztmp_duplicate_sys_user_role; 
+
+create unique index uix_role_userid_org_objid on sys_user_role (role, userid, org_objid)
+; 
+
+
+insert into sys_var (
+	name, value, description, datatype, category 
+) 
+select 
+	name, value, description, datatype, category 
+from v255_caticlan_go.sys_var 
+where name = 'thermal_printername'
+;
+
+
+insert into sys_sequence (
+	objid, nextSeries 
+) 
+select 
+	objid, nextSeries 
+from v255_caticlan_go.sys_sequence 
+where objid like '%-aklanterminal' 
+;
+
+update sys_sequence set 
+	objid = replace(objid, '-aklanterminal', '-ticketing') 
+where 
+	objid like '%-aklanterminal'
+; 
+
+
 
 
 
@@ -135,3 +197,34 @@ INSERT INTO `sys_rule_condition_constraint` VALUES ('RCONST-34053c0e:17b57d3d81e
 INSERT INTO `sys_rule_action` VALUES ('RACT-34053c0e:17b57d3d81e:-7a5f','RUL-34053c0e:17b57d3d81e:-7d01','treasury.actions.AddBillItem','add-billitem',0);
 
 INSERT INTO `sys_rule_action_param` VALUES ('RULACT-34053c0e:17b57d3d81e:-7a1f','RACT-34053c0e:17b57d3d81e:-7a5f','treasury.actions.AddBillItem.amount',NULL,NULL,NULL,NULL,'(ADULT * 50) + ( CHILD * 10 ) + ( SEN * 20 )','expression',NULL,NULL,NULL,NULL,NULL,NULL),('RULACT-34053c0e:17b57d3d81e:-7a47','RACT-34053c0e:17b57d3d81e:-7a5f','treasury.actions.AddBillItem.billcode',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'TERMINAL_FEE','TERMINAL FEE',NULL,NULL,NULL);
+
+
+
+
+insert into sys_user_role (
+	objid, uid, role, userid, username, org_objid, org_name 
+) 
+select 
+	concat('UGM-',MD5(concat(u.objid, o.objid, t0.role))) as objid, 
+	concat('UGM-',MD5(concat(u.objid, o.objid, t0.role))) as uid, 
+	t0.role, u.objid as userid, u.username, o.objid as org_objid, o.name as org_name
+from ( 
+	select distinct user_objid, org_objid, 'COLLECTOR' as role  
+	from v255_caticlan_go.sys_usergroup_member 
+	where org_orgclass = 'TERMINAL' 
+		and usergroup_objid in ('TREASURY.COLLECTOR','TREASURY.SUBCOLLECTOR') 
+)t0 
+	inner join v255_caticlan_go.sys_user u on u.objid = t0.user_objid 
+	inner join v255_caticlan_go.sys_org o on o.objid = t0.org_objid 
+;
+
+delete from sys_user_role where role = 'MASTER' and username <> 'ADMIN'
+;
+
+INSERT INTO `sys_var` (`name`, `value`, `description`, `datatype`, `category`) 
+VALUES ('lgu_name', 'PROVINCIAL GOVT OF AKLAN', NULL, NULL, NULL);
+
+
+
+INSERT INTO `sys_rule_fact_field` (`objid`, `parentid`, `name`, `title`, `datatype`, `sortorder`, `handler`, `lookuphandler`, `lookupkey`, `lookupvalue`, `lookupdatatype`, `multivalued`, `required`, `vardatatype`, `lovname`) VALUES ('ticketing.facts.TicketInfo.routeid', 'ticketing.facts.TicketInfo', 'routeid', 'Route', 'string', '7', 'lookup', 'ticketing_terminal:lookup', 'objid', 'name', NULL, NULL, NULL, 'string', NULL);
+

@@ -55,3 +55,32 @@ from ticket_void v
 	inner join ticket t on t.objid = v.ticketid 
 ;
 
+
+alter table cashreceipt_terminal add (
+	numsenior int not null default '0',
+	numfil int not null default '0',
+	numnonfil int not null default '0'
+); 
+
+update cashreceipt_terminal set discount = 0 where discount is null 
+;
+alter table cashreceipt_terminal modify discount decimal(16,4) not null default '0'
+;
+
+create unique index uix_ticketid on ticket_void (ticketid);
+
+
+
+alter table cashreceipt_terminal add routeid varchar(50) null
+;
+update cashreceipt_terminal set 
+	routeid = (select objid from terminal limit 1) 
+where 
+	routeid is null 
+; 
+alter table cashreceipt_terminal modify routeid varchar(50) not null 
+;
+alter table cashreceipt_terminal add constraint fk_cashreceipt_terminal_routeid 
+	foreign key (routeid) REFERENCES terminal (objid) 
+;
+
