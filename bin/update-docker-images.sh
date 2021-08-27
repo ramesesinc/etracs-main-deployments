@@ -20,3 +20,5 @@ docker pull ramesesinc/local-epayment-server:2.5.01.02.06
 echo ""
 docker pull ramesesinc/etracs-services:2.5.04.01
 echo ""
+docker pull ramesesinc/enterprise-common-server:255.05.001
+echo ""
