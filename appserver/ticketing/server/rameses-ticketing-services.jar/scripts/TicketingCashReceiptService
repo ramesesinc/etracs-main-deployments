@@ -67,13 +67,25 @@ class TicketingCashReceiptService {
 
 	@ProxyMethod
 	public def getBilling( def o ) {
-		def p = o.params?.info;
-		if ( p == null ) 
-			throw new Exception("params.info  parameter is required"); 
+		def info = o.params?.info;
+		if ( info == null ) 
+			throw new Exception("info  parameter is required"); 
 
-		p.routeid = p.route?.objid; 
+		info.numadult = toNumber( info.numadult, 0 ); 
+		if ( info.numadult <= 0 ) throw new Exception('Number of adults must be greater than zero'); 
 
-		if ( !p.tag ) {
+		info.numchildren = Math.max( 0, toNumber( info.numchildren, 0 ));
+		info.numsenior = Math.max( 0, toNumber( info.numsenior, 0 )); 
+		info.numfil = Math.max( 0, toNumber( info.numfil, 0 )); 
+		info.numnonfil = Math.max( 0, toNumber( info.numnonfil, 0 )); 
+
+		info.discount = toNumber( info.discount, 0 ); 
+
+		if ( !info.route?.objid ) throw new Exception('route.objid  parameter is required'); 
+
+		info.routeid = info.route?.objid; 
+
+		if ( !info.tag ) {
 			def collectiontypeid = o.params?.collectiontype?.objid; 
 			if ( collectiontypeid ) {
 				def pp = [ _schemaname: 'collectiontype_account', select: 'objid,tag' ];
@@ -81,11 +93,11 @@ class TicketingCashReceiptService {
 
 				def svc = dynamicSvc.lookup('QueryService', 'treasury'); 
 				def cta = svc.getList( pp )?.first(); 
-				if ( cta ) p.tag = cta.tag; 
+				if ( cta ) info.tag = cta.tag; 
 			}
 		}
 
-		def res = billingSvc.getBilling( p );
+		def res = billingSvc.getBilling( info );
 		res.billitems = res.items;
 		return res;
 	}
@@ -93,11 +105,19 @@ class TicketingCashReceiptService {
 
 	@ProxyMethod
 	public void log( param ) { 
-		if ( !param.action ) throw new Exception('param.action  parameter is required'); 
-		if ( !param.ref ) throw new Exception('param.ref  parameter is required'); 
-		if ( !param.refid ) throw new Exception('param.refid  parameter is required'); 
-		if ( !param.remarks ) throw new Exception('param.remarks  parameter is required'); 
+		if ( !param.action ) throw new Exception('action  parameter is required'); 
+		if ( !param.ref ) throw new Exception('ref  parameter is required'); 
+		if ( !param.refid ) throw new Exception('refid  parameter is required'); 
+		if ( !param.remarks ) throw new Exception('remarks  parameter is required'); 
 
 		logSvc.logA( param.action, param.ref, param.refid, param.remarks ); 
 	} 
+
+
+	def toNumber( def value, Number defaultValue ) {
+		if ( !value ) return defaultValue; 
+		if ( value instanceof Number ) return value; 
+
+		return new Integer( value.toString());  
+	}	
 }
