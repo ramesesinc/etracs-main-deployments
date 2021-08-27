@@ -1,0 +1,103 @@
+import com.rameses.annotations.*;
+
+class TicketingCashReceiptService {
+	
+	@Service( dynamic=true )
+	def dynamicSvc; 
+
+	@Service('Var')
+	def var;
+
+	@Service('LogService')
+	def logSvc;
+
+	@Service("TicketingBillingService")
+	def billingSvc;
+
+
+	@DataContext("ticketing_terminal")
+	def em_terminal;
+
+	@DataContext("cashreceipt_terminal")
+	def em_cashreceipt_terminal; 
+
+	@DataContext("ticket")
+	def em_ticket; 
+
+	@DataContext("vw_ticketing_ticket_void")
+	def vw_ticketing_ticket_void; 
+
+
+	@ProxyMethod
+	public def init( param ) {
+		if ( !param.org?.objid )
+			throw new Exception('org.objid  parameter is required in TicketingCashReceiptService'); 
+
+		def route = em_terminal.find([ objid: param.org.objid ]).first(); 
+		if ( !route ) 
+			throw new Exception("Please register the Org "+ param.org.objid +" in the Ticketing Terminal"); 
+
+		def res = [:]; 
+		res.route = route; 
+		res.paidby = 'TOURIST'; 
+
+        def addr = var.get('collection_default_address'); 
+        res.paidbyaddress = (addr ? addr : route.address); 
+		return res; 
+	}
+
+	@ProxyMethod
+	public def open( param ) {
+		def receiptid = param.objid.toString(); 
+
+		def result = [:]; 
+		result.lguname = var.lgu_name; 
+		result.thermalprintername = var.thermal_printername; 
+
+		result.info = em_cashreceipt_terminal.find([ objid: receiptid ]).first(); 
+
+		def voided = vw_ticketing_ticket_void.find([ refid: receiptid ]).first(); 
+		if ( !voided ) { 
+			result.tickets = em_ticket.find([ refid: receiptid ]).orderBy('seqno').list(); 
+		}
+
+		return result; 
+	} 
+
+
+	@ProxyMethod
+	public def getBilling( def o ) {
+		def p = o.params?.info;
+		if ( p == null ) 
+			throw new Exception("params.info  parameter is required"); 
+
+		p.routeid = p.route?.objid; 
+
+		if ( !p.tag ) {
+			def collectiontypeid = o.params?.collectiontype?.objid; 
+			if ( collectiontypeid ) {
+				def pp = [ _schemaname: 'collectiontype_account', select: 'objid,tag' ];
+				pp.where = ['collectiontypeid = :collectiontypeid AND tag IS NOT NULL', [collectiontypeid : collectiontypeid]]; 
+
+				def svc = dynamicSvc.lookup('QueryService', 'treasury'); 
+				def cta = svc.getList( pp )?.first(); 
+				if ( cta ) p.tag = cta.tag; 
+			}
+		}
+
+		def res = billingSvc.getBilling( p );
+		res.billitems = res.items;
+		return res;
+	}
+
+
+	@ProxyMethod
+	public void log( param ) { 
+		if ( !param.action ) throw new Exception('param.action  parameter is required'); 
+		if ( !param.ref ) throw new Exception('param.ref  parameter is required'); 
+		if ( !param.refid ) throw new Exception('param.refid  parameter is required'); 
+		if ( !param.remarks ) throw new Exception('param.remarks  parameter is required'); 
+
+		logSvc.logA( param.action, param.ref, param.refid, param.remarks ); 
+	} 
+}
