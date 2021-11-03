@@ -25,10 +25,14 @@ Pass : p@ssw0rd
 [Samba]
 URL  : \\localhost
 User : 
-Pass : 
+Pass : p@ssw0rd
 
 
-[DockerHub Images]
+[GitHub]
+git clone https://github.com/ramesesinc/etracs-main-deployments.git
+
+
+[Common-Docker-Images]
 docker pull nginx:latest
 docker pull ramesesinc/mail-server:latest
 docker pull ramesesinc/notification-server:1.0
@@ -38,8 +42,4 @@ docker pull ramesesinc/gdx-client:1.04.01
 docker pull ramesesinc/etracs-web:2.5.02.01
 docker pull ramesesinc/node-download-server:0.0.3
 docker pull ramesesinc/local-epayment-server:2.5.01.02.06
-docker pull ramesesinc/etracs-server-municipality:2.5.04.02.01
-
-
-[GitHub]
-git clone https://github.com/ramesesinc/etracs-municipality-deployments.git
+docker pull ramesesinc/etracs-services:2.5.04.03
