@@ -1,8 +1,8 @@
 import com.rameses.annotations.*;
 
-class TicketingTerminalListInterceptor { 
+class TicketingRouteListInterceptor { 
 	
-	@After(pattern="QueryService.getNodeList", eval="#{ args[0]._schemaname == 'ticketing_terminal' }")
+	@After(pattern="QueryService.getNodeList", eval="#{ args[0]._schemaname == 'ticketing_route' }")
 	public void afterGetNodeList( evt ) {
 		def result = evt.result;
 		result << [title:'ACTIVE', state:'ACTIVE'];
@@ -10,7 +10,7 @@ class TicketingTerminalListInterceptor {
 	}
 
 
-	@Before(pattern="QueryService.getList", eval="#{ args[0]._schemaname == 'ticketing_terminal' }")
+	@Before(pattern="QueryService.getList", eval="#{ args[0]._schemaname == 'ticketing_route' }")
 	public void beforeGetList( evt ) {
 		def o = evt.args[0];
 		def wherelist = [];

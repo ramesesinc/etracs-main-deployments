@@ -1,9 +1,9 @@
 import com.rameses.annotations.*;
 
-class TicketingTurnstileService {
+class TicketingRouteService {
 
-	@DataContext('ticketing_turnstile') 
-	def turnstile; 
+	@DataContext('ticketing_route') 
+	def em_route; 
 
 
 	@ProxyMethod 
@@ -18,7 +18,7 @@ class TicketingTurnstileService {
 
 	def changeState( objid, state ) { 
 		def findby = [ objid: objid.toString() ]; 
-		turnstile.find( findby ).update([ state: state ]); 
-		return turnstile.find( findby ).select('objid,state').first(); 
+		em_route.find( findby ).update([ state: state ]); 
+		return em_route.find( findby ).select('objid,state').first(); 
 	} 
-}	
+} 
