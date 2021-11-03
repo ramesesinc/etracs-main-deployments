@@ -1,4 +1,4 @@
-use v255_caticlan_go;
+use etracs255_caticlan;
 
 
 -- ## 01
@@ -2136,22 +2136,23 @@ alter table batchcapture_collection_entry_item modify `item_title` varchar(255) 
 alter table batchcapture_collection_entry_item modify `fund_objid` varchar(100) NULL ;
 
 
-alter table cashreceipt modify payer_name varchar(800) null ;
-alter table cashreceipt modify paidby varchar(800) not null ;
-alter table cashreceipt add ( 
-  remittanceid varchar(50) null, 
-  subcollector_remittanceid varchar(50) null 
-)
+alter table cashreceipt 
+  modify payer_name varchar(800) null, 
+  modify paidby varchar(800) not null, 
+  add ( 
+    remittanceid varchar(50) null, 
+    subcollector_remittanceid varchar(50) null 
+  ),
+  add (
+    key ix_remittanceid (remittanceid), 
+    key ix_subcollector_remittanceid (subcollector_remittanceid),
+
+    key ix_paidby (paidby) ,
+    key ix_payer_name (payer_name) ,
+    key ix_formtype (formtype) ,
+  )  
 ;
-create index ix_remittanceid on cashreceipt (remittanceid); 
-create index ix_subcollector_remittanceid on cashreceipt (subcollector_remittanceid); 
 
-create index ix_paidby on cashreceipt (paidby) ; 
-create index ix_payer_name on cashreceipt (payer_name) ; 
-create index ix_formtype on cashreceipt (formtype) ; 
-
-
-alter table cashreceiptitem modify receiptid varchar(50) not null ;
 
 create table ztmp_cashreceiptitem_no_item_objid 
 select * from cashreceiptitem where item_objid is null
@@ -2162,17 +2163,25 @@ delete from cashreceiptitem where objid in (
 )
 ;
 
-alter table cashreceiptitem modify item_objid varchar(50) not null ;
-alter table cashreceiptitem modify item_code varchar(100) not null ;
-alter table cashreceiptitem modify item_title varchar(255) not null ;
-alter table cashreceiptitem modify amount decimal(16,4) not null ;
-create index `ix_item_code` on cashreceiptitem (`item_code`) ; 
-create index `ix_item_title` on cashreceiptitem (`item_title`) ; 
+alter table cashreceiptitem 
+  modify (
+    receiptid varchar(50) not null ,
+    item_objid varchar(50) not null ,
+    item_code varchar(100) not null ,
+    item_title varchar(255) not null ,
+    amount decimal(16,4) not null 
+  ), 
+  add ( 
+    sortorder int default '0' , 
+    item_fund_objid varchar(100) null 
+  ), 
+  add (
+    key `ix_item_code` (`item_code`) ,
+    key `ix_item_title` (`item_title`) ,
+    key ix_item_fund_objid (item_fund_objid) 
+  )
+;
 
-alter table cashreceiptitem add sortorder int default '0';
-
-alter table cashreceiptitem add item_fund_objid varchar(100) null ;
-create index ix_item_fund_objid on cashreceiptitem (item_fund_objid) ;
 
 update cashreceiptitem ci, itemaccount ia set 
   ci.item_fund_objid = ia.fund_objid 
@@ -2180,9 +2189,12 @@ where ci.item_objid = ia.objid
 ;
 update cashreceiptitem set item_fund_objid = 'GENERAL' where item_fund_objid is null 
 ; 
-alter table cashreceiptitem modify item_fund_objid varchar(100) not null ;
+
 alter table cashreceiptitem 
-  add constraint fk_cashreceiptitem_item_fund_objid 
+  modify item_fund_objid varchar(100) not null 
+;
+alter table cashreceiptitem add 
+  constraint fk_cashreceiptitem_item_fund_objid 
   foreign key (item_fund_objid) REFERENCES fund (objid) 
 ; 
 
@@ -2692,8 +2704,66 @@ set aa.remittanceid = bb.remittanceid
 where aa.objid = bb.objid
 ;
 
-CONTINUE HERE...update cashreceipt aa, subcollector_remittance_cashreceipt bb 
-set aa.subcollector_remittanceid = bb.remittanceid  
+set foreign_key_checks=0
+;
+update 
+  cashreceipt aa, 
+  ( 
+    select rc.* 
+    from subcollector_remittance_cashreceipt rc, cashreceipt c 
+    where c.receiptdate >= '2017-01-01' 
+      and c.receiptdate <  '2018-01-01'
+      and rc.objid = c.objid 
+  )bb 
+set aa.subcollector_remittanceid = bb.remittanceid 
+where aa.objid = bb.objid 
+;
+update 
+  cashreceipt aa, 
+  ( 
+    select rc.* 
+    from subcollector_remittance_cashreceipt rc, cashreceipt c 
+    where c.receiptdate >= '2018-01-01' 
+      and c.receiptdate <  '2019-01-01'
+      and rc.objid = c.objid 
+  )bb 
+set aa.subcollector_remittanceid = bb.remittanceid 
+where aa.objid = bb.objid 
+;
+update 
+  cashreceipt aa, 
+  ( 
+    select rc.* 
+    from subcollector_remittance_cashreceipt rc, cashreceipt c 
+    where c.receiptdate >= '2019-01-01' 
+      and c.receiptdate <  '2020-01-01'
+      and rc.objid = c.objid 
+  )bb 
+set aa.subcollector_remittanceid = bb.remittanceid 
+where aa.objid = bb.objid 
+;
+update 
+  cashreceipt aa, 
+  ( 
+    select rc.* 
+    from subcollector_remittance_cashreceipt rc, cashreceipt c 
+    where c.receiptdate >= '2020-01-01' 
+      and c.receiptdate <  '2021-01-01'
+      and rc.objid = c.objid 
+  )bb 
+set aa.subcollector_remittanceid = bb.remittanceid 
+where aa.objid = bb.objid 
+;
+update 
+  cashreceipt aa, 
+  ( 
+    select rc.* 
+    from subcollector_remittance_cashreceipt rc, cashreceipt c 
+    where c.receiptdate >= '2021-01-01' 
+      and c.receiptdate <  '2022-01-01'
+      and rc.objid = c.objid 
+  )bb 
+set aa.subcollector_remittanceid = bb.remittanceid 
 where aa.objid = bb.objid 
 ;
 
@@ -2704,6 +2774,9 @@ alter table cashreceipt_share
 alter table cashreceipt_share 
   add constraint fk_cashreceipt_share_payableitem_objid 
   foreign key (payableitem_objid) references itemaccount (objid) ; 
+
+set foreign_key_checks=1
+;
 
 
 create index ix_txnno on certification (txnno) ; 
@@ -4387,9 +4460,15 @@ update itemaccount set state = 'INACTIVE' where state = 'DRAFT'
 -- create index `ix_receiptdate` on cashreceipt (`receiptdate`); 
 -- create index `ix_user_objid` on cashreceipt (`user_objid`); 
 
+
+set foreign_key_checks=0
+;
 alter table cashreceipt add CONSTRAINT `fk_cashreceipt_collector_objid` 
   FOREIGN KEY (`collector_objid`) REFERENCES `sys_user` (`objid`)
-; 
+;
+set foreign_key_checks=1
+;
+
 alter table cashreceipt 
   modify controlid varchar(50) character set utf8 not null 
 ; 
