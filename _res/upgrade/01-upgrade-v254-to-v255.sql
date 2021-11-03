@@ -2164,13 +2164,12 @@ delete from cashreceiptitem where objid in (
 ;
 
 alter table cashreceiptitem 
-  modify (
-    receiptid varchar(50) not null ,
-    item_objid varchar(50) not null ,
-    item_code varchar(100) not null ,
-    item_title varchar(255) not null ,
-    amount decimal(16,4) not null 
-  ), 
+  modify receiptid varchar(50) not null ,
+  modify item_objid varchar(50) not null ,
+  modify item_code varchar(100) not null ,
+  modify item_title varchar(255) not null ,
+  modify amount decimal(16,4) not null ,
+
   add ( 
     sortorder int default '0' , 
     item_fund_objid varchar(100) null 
