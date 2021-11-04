@@ -220,7 +220,6 @@ rename table cashbook to z20181120_cashbook ;
 rename table directcash_collection_item to z20181120_directcash_collection_item ; 
 rename table directcash_collection to z20181120_directcash_collection ; 
 
-
 rename table liquidation_remittance to z20181120_liquidation_remittance ; 
 rename table liquidation_noncashpayment to z20181120_liquidation_noncashpayment ; 
 rename table liquidation_creditmemopayment to z20181120_liquidation_creditmemopayment ; 
@@ -250,7 +249,6 @@ rename table stocksale to z20181120_stocksale ;
 
 rename table stockrequestitem to z20181120_stockrequestitem ; 
 rename table stockrequest to z20181120_stockrequest ; 
-
 rename table stockreturn to z20181120_stockreturn ; 
 
 rename table stockitem_unit to z20181120_stockitem_unit ; 
@@ -271,7 +269,6 @@ drop table if exists draft_remittance;
 
 -- ## 03
 drop table if exists account_incometarget; 
-
 drop table if exists account_item_mapping; 
 drop table if exists account_group; 
 drop table if exists account; 
