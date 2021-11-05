@@ -136,7 +136,15 @@ INSERT INTO zpatch20181120_sys_usergroup_permission (`objid`, `usergroup_objid`,
 
 alter table sys_usergroup_permission modify objid varchar(100) not null 
 ; 
+
+alter table sys_usergroup_member drop foreign key sys_usergroup_member_ibfk_3
+;
 alter table sys_securitygroup modify objid varchar(100) not null 
+;
+alter table sys_usergroup_member modify `securitygroup_objid` varchar(100) NULL
+;
+alter table sys_usergroup_member add CONSTRAINT `fk_sys_usergroup_member_securitygroup_objid` 
+  FOREIGN KEY (`securitygroup_objid`) REFERENCES `sys_securitygroup` (`objid`)
 ;
 
 
@@ -2121,7 +2129,14 @@ create index ix_name on bank (name);
 -- create index ix_code on bank (code);
 
 
-alter table bankaccount modify fund_objid varchar(100) null not null ;  
+alter table bankaccount drop foreign key fk_bankaccount_fund_objid
+;
+alter table bankaccount modify fund_objid varchar(100) null not null 
+;
+alter table bankaccount add CONSTRAINT `fk_bankaccount_fund_objid` 
+  FOREIGN KEY (`fund_objid`) REFERENCES `fund` (`objid`)
+;
+
 alter table bankaccount add acctid varchar(50) null ; 
 create index ix_acctid on bankaccount (acctid) ;
 alter table bankaccount 
@@ -2130,7 +2145,14 @@ alter table bankaccount
 
 
 alter table batchcapture_collection_entry_item modify `item_title` varchar(255) NULL ;
-alter table batchcapture_collection_entry_item modify `fund_objid` varchar(100) NULL ;
+
+alter table batchcapture_collection_entry_item drop foreign key fk_batchcapture_collection_entry_item_fund
+;
+alter table batchcapture_collection_entry_item modify `fund_objid` varchar(100) NULL 
+;
+alter table batchcapture_collection_entry_item add CONSTRAINT fk_batchcapture_collection_entry_item_fund
+  FOREIGN KEY (`fund_objid`) REFERENCES `fund` (`objid`)
+;
 
 
 alter table cashreceipt 
@@ -2146,7 +2168,7 @@ alter table cashreceipt
 
     key ix_paidby (paidby) ,
     key ix_payer_name (payer_name) ,
-    key ix_formtype (formtype) ,
+    key ix_formtype (formtype) 
   )  
 ;
 
@@ -2458,7 +2480,81 @@ alter table entitymember modify member_name varchar(800) not null ;
 alter table entity_address modify street varchar(255) null ;
 
 
-alter table fund modify objid varchar(100) not null ; 
+alter table bankaccount drop foreign key fk_bankaccount_fund_objid
+;
+alter table batchcapture_collection_entry_item drop foreign key fk_batchcapture_collection_entry_item_fund
+;
+alter table itemaccount drop foreign key `fk_itemaccount_fund` 
+;
+alter table z20181120_cashbook drop foreign key fk_cashbook_fund
+;
+alter table z20181120_ngas_revenueitem drop foreign key z20181120_ngas_revenueitem_ibfk_3
+; 
+alter table remittance_fund drop foreign key `fk_remittance_fund_fund` 
+;
+alter table cashreceiptitem drop foreign key `fk_cashreceiptitem_item_fund_objid` 
+;
+alter table cashreceiptpayment_noncash drop foreign key `fk_cashreceiptpayment_noncash_fund_objid` 
+;
+alter table collectionvoucher_fund drop foreign key `fk_collectionvoucher_fund_fund_objid` 
+;
+alter table creditmemotype drop foreign key `fk_creditmemotype_fund_objid` 
+;
+alter table deposit_fund_transfer drop foreign key `fk_deposit_fund_transfer_fromdepositvoucherfundid` 
+;
+alter table deposit_fund_transfer drop foreign key `fk_deposit_fund_transfer_todepositvoucherfundid` 
+;
+alter table depositvoucher_fund drop foreign key `fk_depositvoucher_fund_fundid` 
+; 
+alter table eftpayment drop foreign key `fk_eftpayment_fund` 
+; 
+alter table checkpayment drop foreign key `fk_paymentcheck_fund` 
+;
+
+alter table fund modify objid varchar(100) not null 
+; 
+alter table bankaccount add CONSTRAINT `fk_bankaccount_fund_objid` 
+  FOREIGN KEY (`fund_objid`) REFERENCES `fund` (`objid`)
+; 
+alter table batchcapture_collection_entry_item add CONSTRAINT `fk_batchcapture_collection_entry_item_fund` 
+  FOREIGN KEY (`fund_objid`) REFERENCES `fund` (`objid`)
+; 
+alter table itemaccount add CONSTRAINT `fk_itemaccount_fund` 
+  FOREIGN KEY (`fund_objid`) REFERENCES `fund` (`objid`)
+;
+alter table remittance_fund add CONSTRAINT `fk_remittance_fund_fund` 
+  FOREIGN KEY (`fund_objid`) REFERENCES `fund` (`objid`)
+;
+alter table cashreceiptitem add CONSTRAINT `fk_cashreceiptitem_item_fund_objid` 
+  FOREIGN KEY (`item_fund_objid`) REFERENCES `fund` (`objid`)
+; 
+alter table cashreceiptpayment_noncash add CONSTRAINT `fk_cashreceiptpayment_noncash_fund_objid` 
+  FOREIGN KEY (`fund_objid`) REFERENCES `fund` (`objid`)
+;
+alter table collectionvoucher_fund add CONSTRAINT `fk_collectionvoucher_fund_fund_objid` 
+  FOREIGN KEY (`fund_objid`) REFERENCES `fund` (`objid`)
+;
+alter table creditmemotype add CONSTRAINT `fk_creditmemotype_fund_objid` 
+  FOREIGN KEY (`fund_objid`) REFERENCES `fund` (`objid`)
+;
+
+
+alter table deposit_fund_transfer add CONSTRAINT `fk_deposit_fund_transfer_fromdepositvoucherfundid` 
+  FOREIGN KEY (`fromdepositvoucherfundid`) REFERENCES `depositvoucher_fund` (`objid`)
+;
+alter table deposit_fund_transfer add CONSTRAINT `fk_deposit_fund_transfer_todepositvoucherfundid` 
+  FOREIGN KEY (`todepositvoucherfundid`) REFERENCES `depositvoucher_fund` (`objid`)
+;
+alter table depositvoucher_fund add CONSTRAINT `fk_depositvoucher_fund_fundid` 
+  FOREIGN KEY (`fundid`) REFERENCES `fund` (`objid`)
+;
+alter table eftpayment add CONSTRAINT `fk_eftpayment_fund` 
+  FOREIGN KEY (`fundid`) REFERENCES `fund` (`objid`)
+; 
+alter table checkpayment add CONSTRAINT `fk_paymentcheck_fund` 
+  FOREIGN KEY (`fundid`) REFERENCES `fund` (`objid`)
+; 
+
 
 alter table fund add ( 
   `groupid` varchar(50) NULL,
@@ -2498,7 +2594,10 @@ where aa.objid = bb.fund_objid
 ;
 
 
-alter table itemaccount modify fund_objid varchar(100) null; 
+alter table itemaccount drop foreign key fk_itemaccount_fund
+;
+alter table itemaccount modify fund_objid varchar(100) null
+; 
 alter table itemaccount add constraint fk_itemaccount_fund_objid 
   foreign key (fund_objid) references fund (objid)
 ;
@@ -2516,8 +2615,10 @@ create index `ix_type` on itemaccount (`type`) ;
 update itemaccount set state = 'ACTIVE' where state = 'APPROVED' ; 
 
 
-alter table remittance_fund modify fund_objid varchar(100) not null; 
-
+alter table remittance_fund drop foreign key fk_remittance_fund_fund
+;
+alter table remittance_fund modify fund_objid varchar(100) not null
+; 
 alter table remittance_fund add constraint fk_remittance_fund_fund_objid 
   foreign key (fund_objid) references fund (objid)
 ;
@@ -4560,8 +4661,6 @@ alter table fund add constraint fk_fund_depositoryfundid
 -- create index `ix_code` on itemaccount (`code`); 
 -- create index `ix_title` on itemaccount (`title`); 
 -- create index `ix_parentid` on itemaccount (`parentid`); 
-alter table itemaccount drop foreign key fk_itemaccount_fund;
-
 
 
 drop table if exists paymentorder; 
