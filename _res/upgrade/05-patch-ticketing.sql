@@ -100,6 +100,10 @@ from ztmp_user_role ur
 	inner join sys_user u on u.objid = ur.userid 
 ;
 
+drop table ztmp_user_admin;
+drop table ztmp_user_collector;
+drop table ztmp_user_role;
+
 
 delete from cagban_go.sys_usergroup_member where usergroup_objid like 'TERMINAL.%'
 ;
@@ -131,3 +135,59 @@ update sys_sequence set
 where 
 	objid like '%-aklanterminal'
 ; 
+
+
+
+
+create table ztmp_user_role_master 
+select * from sys_user_role where role='MASTER'
+;
+delete from sys_user_role where objid in (
+	select objid from ztmp_user_role_master 
+)
+;
+delete from sys_user where objid in (
+	select userid from ztmp_user_role_master 
+) and (
+	select count(*) from sys_user_role 
+	where userid = sys_user.objid 
+) = 0 
+;
+drop table ztmp_user_role_master
+;
+
+
+insert ignore into sys_user (
+	objid, username, firstname, lastname, middlename, name, jobtitle, txncode 
+) 
+select 
+	u.objid, u.username, u.firstname, u.lastname, u.middlename, u.name, u.jobtitle, u.txncode 
+from (
+	select distinct ugm.user_objid 
+	from cagban_go.sys_usergroup_member ugm 
+		inner join cagban_go.sys_usergroup ug on ug.objid = ugm.usergroup_objid 
+		inner join terminal t on t.objid = ugm.org_objid 
+	where ugm.org_orgclass = 'TERMINAL'
+		and ugm.usergroup_objid in ('TREASURY.COLLECTOR','TREASURY.SUBCOLLECTOR') 
+)t0, cagban_go.sys_user u 
+where u.objid = t0.user_objid 
+;
+
+insert ignore into sys_user_role (
+	objid, uid, role, userid, username, org_objid, org_name 
+) 
+select 
+	CONCAT('UR-', MD5(CONCAT(t0.userid, t0.role, t0.org_objid))) as objid, 
+	CONCAT('UR-', MD5(CONCAT(t0.userid, t0.role, t0.org_objid))) as uid, 
+	t0.role, t0.userid, u.username, t0.org_objid, t0.org_name 
+from ( 
+	select distinct 
+		'MASTER' as role, ugm.user_objid as userid, ugm.user_username as username, ugm.org_objid, ugm.org_name 
+	from cagban_go.sys_usergroup_member ugm 
+		inner join cagban_go.sys_usergroup ug on ug.objid = ugm.usergroup_objid 
+		inner join terminal t on t.objid = ugm.org_objid 
+	where ugm.org_orgclass = 'TERMINAL'
+		and ugm.usergroup_objid in ('TREASURY.COLLECTOR','TREASURY.SUBCOLLECTOR') 
+)t0, sys_user u 
+where u.objid = t0.userid 
+;

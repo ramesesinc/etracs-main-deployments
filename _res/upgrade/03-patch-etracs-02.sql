@@ -175,3 +175,60 @@ from (
 )t0, fund 
 where fund.title = 'EEDD' 
 ;
+
+
+
+create table ztmp_collectors 
+select * 
+from ( 
+  select distinct 
+    collector_objid as user_objid, 'TREASURY.COLLECTOR' as usergroup_objid 
+  from cashreceipt 
+  union 
+  select distinct 
+    subcollector_objid as user_objid, 'TREASURY.SUBCOLLECTOR' as usergroup_objid 
+  from cashreceipt 
+)t0 
+where user_objid is not null 
+order by user_objid, usergroup_objid 
+;
+
+delete from sys_usergroup_member where usergroup_objid = 'TREASURY.SUBCOLLECTOR'
+; 
+
+insert into sys_usergroup_member (
+  objid, usergroup_objid, user_objid, user_username, user_firstname, user_lastname, org_objid, org_name, org_orgclass 
+) 
+select 
+  CONCAT('UGM-', MD5(CONCAT(z.user_objid, z.usergroup_objid, org.objid))) as objid, 
+  z.usergroup_objid, z.user_objid, u.username as user_username, u.firstname as user_firstname, u.lastname as user_lastname, 
+  org.objid as org_objid, org.name as org_name, org.orgclass as org_orgclass 
+from ztmp_collectors z 
+  inner join sys_org org on org.orgclass = 'TERMINAL' 
+  inner join sys_user u on u.objid = z.user_objid 
+where z.usergroup_objid = 'TREASURY.SUBCOLLECTOR'
+  and org.objid in ('1','AKL','RORO') 
+;
+
+drop table ztmp_collectors
+;
+
+
+
+update collectiontype set state='INACTIVE', system=1 where `handler` like '%terminal%' 
+;
+
+insert into collectiontype (
+  objid, state, name, title, formno, `handler`, 
+  allowbatch, allowonline, allowoffline, sortorder, 
+  org_objid, org_name, allowpaymentorder, allowkiosk, 
+  allowcreditmemo, system 
+) 
+select 
+  CONCAT('COLLTYPE-', MD5(CONCAT(ct.name, ct.handler, ct.org_objid))) as objid, 
+  'ACTIVE' as state, ct.name, ct.title, ct.formno, 'ticketing' as `handler`, 
+  0 as allowbatch, 1 as allowonline, 1 as allowoffline, ct.sortorder, ct.org_objid, ct.org_name, 
+  0 as allowpaymentorder, 0 as allowkiosk, 0 as allowcreditmemo, 0 as system 
+from collectiontype ct 
+where ct.name = 'AKLAN-TERMINAL-TOURIST' 
+;
