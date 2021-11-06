@@ -248,3 +248,29 @@ where
 ; 
 drop table ztmp_route
 ;
+
+
+
+insert into sys_user_role (
+	objid, uid, role, userid, username, org_objid, org_name 
+) 
+select * 
+from ( 
+	select distinct 
+		CONCAT('UR-',MD5(CONCAT( ur.role, u.objid, t.objid ))) as objid, 
+		CONCAT('UR-',MD5(CONCAT( ur.role, u.objid, t.objid ))) as uid, 
+		'COLLECTOR' as role, u.objid as userid, u.username, 
+		t.objid as org_objid, t.name as org_name  
+	from caticlan_go.sys_usergroup_member ugm 
+		inner join (select 'COLLECTOR' as role) ur 
+		inner join sys_user u on u.objid = ugm.user_objid 
+		inner join terminal t on t.objid = ugm.org_objid 
+	where ugm.usergroup_objid in ('TREASURY.COLLECTOR') 
+)t0 
+where (
+	select count(*) from sys_user_role 
+	where userid = t0.userid 
+		and role = t0.role 
+		and org_objid = t0.org_objid 
+) = 0 
+;
