@@ -215,20 +215,7 @@ drop table ztmp_collectors
 
 
 
-update collectiontype set state='INACTIVE', system=1 where `handler` like '%terminal%' 
+update collectiontype set `handler`='ticketing' where `handler` = 'aklanterminal'
 ;
-
-insert into collectiontype (
-  objid, state, name, title, formno, `handler`, 
-  allowbatch, allowonline, allowoffline, sortorder, 
-  org_objid, org_name, allowpaymentorder, allowkiosk, 
-  allowcreditmemo, system 
-) 
-select 
-  CONCAT('COLLTYPE-', MD5(CONCAT(ct.name, ct.handler, ct.org_objid))) as objid, 
-  'ACTIVE' as state, ct.name, ct.title, ct.formno, 'ticketing' as `handler`, 
-  0 as allowbatch, 1 as allowonline, 1 as allowoffline, ct.sortorder, ct.org_objid, ct.org_name, 
-  0 as allowpaymentorder, 0 as allowkiosk, 0 as allowcreditmemo, 0 as system 
-from collectiontype ct 
-where ct.name = 'AKLAN-TERMINAL-TOURIST' 
-;
+update collectiontype set org_objid=null, org_name=null
+; 
