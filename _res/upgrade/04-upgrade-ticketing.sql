@@ -1,4 +1,4 @@
-use cagban_terminal_go;
+use caticlan_terminal_go;
 
 --
 -- fix existing tables to utf8 character set

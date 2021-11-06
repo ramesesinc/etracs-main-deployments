@@ -1,4 +1,4 @@
-use cagban_terminal_go;
+use caticlan_terminal_go;
 
 
 create table ztmp_user_admin
@@ -6,10 +6,10 @@ select
 	u.objid, u.username, u.lastname, u.firstname, u.middlename, u.name, u.jobtitle, u.txncode 
 from ( 
 	select ugm.user_objid 
-	from cagban_go.sys_usergroup_member ugm 
-		inner join cagban_go.sys_usergroup ug on ug.objid = ugm.usergroup_objid 
+	from caticlan_go.sys_usergroup_member ugm 
+		inner join caticlan_go.sys_usergroup ug on ug.objid = ugm.usergroup_objid 
 	where ugm.usergroup_objid = 'TERMINAL.ADMIN' 
-)t0, cagban_go.sys_user u 
+)t0, caticlan_go.sys_user u 
 where u.objid = t0.user_objid 
 ;
 
@@ -17,10 +17,10 @@ create table ztmp_user_collector
 select 
 	u.objid, u.username, u.lastname, u.firstname, u.middlename, u.name, u.jobtitle, u.txncode 
 from ( 
-	select distinct collector_objid as user_objid from cagban_go.cashreceipt 
+	select distinct collector_objid as user_objid from caticlan_go.cashreceipt 
 	union 
-	select distinct subcollector_objid as user_objid from cagban_go.cashreceipt 
-)t0, cagban_go.sys_user u 
+	select distinct subcollector_objid as user_objid from caticlan_go.cashreceipt 
+)t0, caticlan_go.sys_user u 
 where u.objid = t0.user_objid 
 ;
 
@@ -30,8 +30,8 @@ from (
 	select 
 		ugm.objid, 'ADMIN' as role, ugm.user_objid as userid, ugm.user_username as username, 
 		ugm.org_objid, ugm.org_name, ugm.securitygroup_objid, ugm.exclude, ugm.objid as uid 
-	from cagban_go.sys_usergroup_member ugm 		
-		inner join cagban_go.sys_usergroup ug on ug.objid = ugm.usergroup_objid 
+	from caticlan_go.sys_usergroup_member ugm 		
+		inner join caticlan_go.sys_usergroup ug on ug.objid = ugm.usergroup_objid 
 		inner join ztmp_user_admin zua on zua.objid = ugm.user_objid 
 	where ugm.usergroup_objid = 'TERMINAL.ADMIN' 
 
@@ -40,8 +40,8 @@ from (
 	select distinct 
 		ugm.objid, 'MASTER' as role, ugm.user_objid as userid, ugm.user_username as username, 
 		ugm.org_objid, ugm.org_name, ugm.securitygroup_objid, ugm.exclude, ugm.objid as uid 
-	from cagban_go.sys_usergroup_member ugm 
-		inner join cagban_go.sys_usergroup ug on ug.objid = ugm.usergroup_objid 
+	from caticlan_go.sys_usergroup_member ugm 
+		inner join caticlan_go.sys_usergroup ug on ug.objid = ugm.usergroup_objid 
 		inner join ztmp_user_collector zuc on zuc.objid = ugm.user_objid 
 	where ugm.org_orgclass = 'TERMINAL'
 		and ugm.usergroup_objid in ('TREASURY.COLLECTOR','TREASURY.SUBCOLLECTOR') 
@@ -101,9 +101,9 @@ from ztmp_user_role ur
 ;
 
 
-delete from cagban_go.sys_usergroup_member where usergroup_objid like 'TERMINAL.%'
+delete from caticlan_go.sys_usergroup_member where usergroup_objid like 'TERMINAL.%'
 ;
-delete from cagban_go.sys_usergroup where domain='TERMINAL'
+delete from caticlan_go.sys_usergroup where domain='TERMINAL'
 ;
 
 
@@ -112,7 +112,7 @@ insert ignore into sys_var (
 ) 
 select 
 	name, value, description, datatype, category 
-from cagban_go.sys_var 
+from caticlan_go.sys_var 
 where name = 'thermal_printername'
 ;
 
@@ -122,7 +122,7 @@ insert into sys_sequence (
 ) 
 select 
 	objid, nextSeries 
-from cagban_go.sys_sequence 
+from caticlan_go.sys_sequence 
 where objid like '%-aklanterminal' 
 ;
 
