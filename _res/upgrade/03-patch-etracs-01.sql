@@ -1,4 +1,4 @@
-use etracs255_cagban;
+use cagban_go;
 
 
 -- ## 2021-08-20

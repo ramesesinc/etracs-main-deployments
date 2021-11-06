@@ -1,4 +1,4 @@
-use ticketing_cagban;
+use cagban_terminal_go;
 
 --
 -- fix existing tables to utf8 character set
@@ -139,13 +139,17 @@ alter table turnstile_item
 
 
 INSERT INTO `caticlan`.`sys_org` (`objid`, `name`, `orgclass`, `parent_objid`, `parent_orgclass`, `code`, `root`, `txncode`) 
-VALUES ('CAG', 'CAGBAN JETTY PORT TERMINAL', 'TERMINAL', '038', 'PROVINCE', 'CAG', '0', NULL);
+VALUES ('038CAG', 'CAGBAN JETTY PORT TERMINAL', 'TERMINAL', '038', 'PROVINCE', '038CAG', '0', NULL);
 
 INSERT INTO `caticlan`.`sys_org` (`objid`, `name`, `orgclass`, `parent_objid`, `parent_orgclass`, `code`, `root`, `txncode`) 
-VALUES ('CAT', 'CATICLAN JETTY PORT TERMINAL', 'TERMINAL', '038', 'PROVINCE', 'CAT', '0', NULL);
+VALUES ('038CAT', 'CATICLAN JETTY PORT TERMINAL', 'TERMINAL', '038', 'PROVINCE', '038CAT', '0', NULL);
 
-INSERT INTO `terminal` (`objid`, `state`, `name`, `address`) VALUES ('CAG', 'ACTIVE', 'CAGBAN JETTY PORT TERMINAL', 'CAGBAN JETTY PORT TERMINAL, AKLAN');
-INSERT INTO `terminal` (`objid`, `state`, `name`, `address`) VALUES ('CAT', 'ACTIVE', 'CATICLAN JETTY PORT TERMINAL', 'CATICLAN JETTY PORT TERMINAL, AKLAN');
+
+INSERT INTO `terminal` (`objid`, `state`, `name`, `address`) 
+VALUES ('038CAG', 'ACTIVE', 'CAGBAN JETTY PORT TERMINAL', 'CAGBAN JETTY PORT TERMINAL, AKLAN');
+
+INSERT INTO `terminal` (`objid`, `state`, `name`, `address`) 
+VALUES ('038CAT', 'ACTIVE', 'CATICLAN JETTY PORT TERMINAL', 'CATICLAN JETTY PORT TERMINAL, AKLAN');
 
 
 --
@@ -167,7 +171,9 @@ CREATE TABLE `route` (
   CONSTRAINT `fk_route_originid` FOREIGN KEY (`originid`) REFERENCES `terminal` (`objid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO `route` VALUES ('1','INACTIVE','CATICLAN - CAGBAN - 1',0,'CAT','CAG'),('2','INACTIVE','CAGBAN - CATICLAN - 2',1,'CAG','CAT'),('ROUTE290d16d3:17ba01919c0:-7ef0','ACTIVE','CATICLAN - CAGBAN',0,'CAT','CAG'),('ROUTE5e26f8cc:17ba02c32c0:-7f77','ACTIVE','CAGBAN - CATICLAN',1,'CAG','CAT');
+INSERT INTO `route` VALUES 
+('ROUTE290d16d3:17ba01919c0:-7ef0','ACTIVE','CATICLAN - CAGBAN',0,'038CAT','038CAG'),
+('ROUTE5e26f8cc:17ba02c32c0:-7f77','ACTIVE','CAGBAN - CATICLAN',1,'038CAG','038CAT');
 
 
 --
