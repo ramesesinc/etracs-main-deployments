@@ -191,3 +191,60 @@ from (
 )t0, sys_user u 
 where u.objid = t0.userid 
 ;
+
+
+
+create table ztmp_terminal 
+select distinct 
+	cto.org_objid as objid, 'ACTIVE' as state, cto.org_name as name, 
+	'Caticlan Jetty Port Terminal, Aklan' as address 
+from caticlan_go.collectiontype ct
+	inner join caticlan_go.collectiontype_org cto on cto.collectiontypeid = ct.objid 
+where ct.handler = 'ticketing' 
+order by ct.org_objid
+;
+insert into terminal (
+	objid, state, name, address 
+) 
+select 
+	objid, state, name, address 
+from ztmp_terminal z 
+where (
+		select count(*) from terminal where objid = z.objid 
+	) = 0
+; 
+drop table ztmp_terminal
+; 
+
+
+create table ztmp_route 
+select distinct 
+	cto.org_objid as objid, 'ACTIVE' as state, cto.org_name as name, 
+	0 as sortorder, cto.org_objid as originid, null as destinationid 
+from caticlan_go.collectiontype ct
+	inner join caticlan_go.collectiontype_org cto on cto.collectiontypeid = ct.objid 
+	inner join terminal t on t.objid = cto.org_objid 
+where ct.handler = 'ticketing' 
+order by cto.org_objid 
+;
+insert into route ( 
+	objid, state, name, sortorder, originid, destinationid 
+)
+select 
+	objid, state, name, sortorder, originid, destinationid 
+from ztmp_route r 
+where ( select count(*) from route where objid = r.objid ) = 0 
+; 
+update 
+	route aa, ztmp_route bb 
+set
+	aa.state = bb.state, 
+	aa.name = bb.name, 
+	aa.sortorder = bb.sortorder, 
+	aa.originid = bb.originid, 
+	aa.destinationid = bb.destinationid 
+where 
+	aa.objid = bb.objid 
+; 
+drop table ztmp_route
+;
