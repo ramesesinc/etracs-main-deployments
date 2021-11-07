@@ -895,6 +895,9 @@ set foreign_key_checks=1
 -- Table structure for table `ticket`
 --
 
+set foreign_key_checks=0
+;
+
 alter table `ticket` 
   add `routeid` varchar(50) CHARACTER SET utf8 NULL,
   add `traveldate` date NULL,
@@ -922,6 +925,9 @@ ALTER TABLE `ticket_void`
 ALTER TABLE `ticket_void` 
   ADD CONSTRAINT `fk_ticket_void_ticketid` 
   FOREIGN KEY (`ticketid`) REFERENCES `ticket` (`objid`)
+;
+
+set foreign_key_checks=1
 ;
 
 
