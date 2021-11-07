@@ -1,4 +1,4 @@
-use cagban_go;
+use etracs255_cagban;
 
 
 -- ## 2021-11-05
@@ -219,3 +219,19 @@ update collectiontype set `handler`='ticketing' where `handler` = 'aklanterminal
 ;
 update collectiontype set org_objid=null, org_name=null
 ; 
+
+
+
+set foreign_key_checks=0
+;
+
+drop table if exists ticket_void; 
+drop table if exists ticket; 
+drop table if exists terminalpass; 
+drop table if exists terminal; 
+drop table if exists turnstile_item; 
+drop table if exists turnstile; 
+drop table if exists turnstile_category; 
+
+set foreign_key_checks=1
+;
