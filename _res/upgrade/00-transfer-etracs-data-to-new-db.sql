@@ -95,15 +95,15 @@ where txndate >= '2021-01-01'
 insert into batchcapture_collection_entry 
 select ce.* 
 from caticlan_go.batchcapture_collection c 
-	inner join batchcapture_collection_entry ce on ce.parentid = c.objid 
+	inner join caticlan_go.batchcapture_collection_entry ce on ce.parentid = c.objid 
 where c.txndate >= '2021-01-01' 
 ; 
 
 insert into batchcapture_collection_entry_item 
 select cei.* 
 from caticlan_go.batchcapture_collection c 
-	inner join batchcapture_collection_entry ce on ce.parentid = c.objid 
-	inner join batchcapture_collection_entry_item cei on cei.parentid = ce.objid 
+	inner join caticlan_go.batchcapture_collection_entry ce on ce.parentid = c.objid 
+	inner join caticlan_go.batchcapture_collection_entry_item cei on cei.parentid = ce.objid 
 where c.txndate >= '2021-01-01' 
 ; 
 
