@@ -195,13 +195,16 @@ where u.objid = t0.userid
 
 
 create table ztmp_terminal 
-select distinct 
-	cto.org_objid as objid, 'ACTIVE' as state, cto.org_name as name, 
-	'Caticlan Jetty Port Terminal, Aklan' as address 
-from caticlan_go.collectiontype ct
-	inner join caticlan_go.collectiontype_org cto on cto.collectiontypeid = ct.objid 
-where ct.handler = 'ticketing' 
-order by ct.org_objid
+select * 
+from ( 
+	select distinct 
+		cto.org_objid as objid, 'ACTIVE' as state, cto.org_name as name, 
+		'Cagban Jetty Port Terminal, Aklan' as address 
+	from cagban_go.collectiontype ct
+		inner join cagban_go.collectiontype_org cto on cto.collectiontypeid = ct.objid 
+	where ct.handler = 'ticketing' 
+)t0 
+order by objid
 ;
 insert into terminal (
 	objid, state, name, address 
