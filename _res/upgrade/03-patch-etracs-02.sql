@@ -1,4 +1,4 @@
-use caticlan_go;
+use etracs255_caticlan;
 
 
 -- ## 2021-11-05
@@ -12,7 +12,7 @@ drop table if exists async_notification;
 drop table if exists cashreceiptitem_rpt_noledger; 
 drop table if exists cashreceiptitem_rpt; 
 
-rename table cashreceipt_terminal to z20211105_cashreceipt_terminal; 
+-- rename table cashreceipt_terminal to z20211105_cashreceipt_terminal; 
 
 drop table if exists cloud_notification_failed;
 drop table if exists cloud_notification_delivered;
@@ -74,8 +74,8 @@ CREATE TABLE `remote_mapping` (
 ;
 
 
-rename table specialpass_account to z20211105_specialpass_account; 
-rename table specialpass_type to z20211105_specialpass_type; 
+-- rename table specialpass_account to z20211105_specialpass_account; 
+-- rename table specialpass_type to z20211105_specialpass_type; 
 
 rename table sreaccount_incometarget to z20211105_sreaccount_incometarget;
 rename table sre_revenue_mapping to z20211105_sre_revenue_mapping;

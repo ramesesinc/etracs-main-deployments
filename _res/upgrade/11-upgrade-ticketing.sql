@@ -1,4 +1,4 @@
-use caticlan_terminal_go;
+use ticketing_caticlan;
 
 --
 -- fix existing tables to utf8 character set
@@ -921,7 +921,10 @@ ALTER TABLE `ticket_void`
   ADD KEY `ix_txndate` (`txndate`),
   ADD KEY `ix_postedby_objid` (`postedby_objid`),
   ADD KEY `ix_postedby_name` (`postedby_name`)
-; 
+;
+ALTER TABLE `ticket_void` 
+  MODIFY ticketid varchar(50) CHARACTER SET latin1 NOT NULL
+;
 ALTER TABLE `ticket_void` 
   ADD CONSTRAINT `fk_ticket_void_ticketid` 
   FOREIGN KEY (`ticketid`) REFERENCES `ticket` (`objid`)

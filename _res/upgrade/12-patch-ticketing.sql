@@ -1,4 +1,4 @@
-use caticlan_terminal_go;
+use ticketing_caticlan;
 
 
 create table ztmp_user_admin
@@ -6,10 +6,10 @@ select
 	u.objid, u.username, u.lastname, u.firstname, u.middlename, u.name, u.jobtitle, u.txncode 
 from ( 
 	select ugm.user_objid 
-	from caticlan_go.sys_usergroup_member ugm 
-		inner join caticlan_go.sys_usergroup ug on ug.objid = ugm.usergroup_objid 
+	from etracs255_caticlan.sys_usergroup_member ugm 
+		inner join etracs255_caticlan.sys_usergroup ug on ug.objid = ugm.usergroup_objid 
 	where ugm.usergroup_objid = 'TERMINAL.ADMIN' 
-)t0, caticlan_go.sys_user u 
+)t0, etracs255_caticlan.sys_user u 
 where u.objid = t0.user_objid 
 ;
 
@@ -17,10 +17,10 @@ create table ztmp_user_collector
 select 
 	u.objid, u.username, u.lastname, u.firstname, u.middlename, u.name, u.jobtitle, u.txncode 
 from ( 
-	select distinct collector_objid as user_objid from caticlan_go.cashreceipt 
+	select distinct collector_objid as user_objid from etracs255_caticlan.cashreceipt 
 	union 
-	select distinct subcollector_objid as user_objid from caticlan_go.cashreceipt 
-)t0, caticlan_go.sys_user u 
+	select distinct subcollector_objid as user_objid from etracs255_caticlan.cashreceipt 
+)t0, etracs255_caticlan.sys_user u 
 where u.objid = t0.user_objid 
 ;
 
@@ -30,8 +30,8 @@ from (
 	select 
 		ugm.objid, 'ADMIN' as role, ugm.user_objid as userid, ugm.user_username as username, 
 		ugm.org_objid, ugm.org_name, ugm.securitygroup_objid, ugm.exclude, ugm.objid as uid 
-	from caticlan_go.sys_usergroup_member ugm 		
-		inner join caticlan_go.sys_usergroup ug on ug.objid = ugm.usergroup_objid 
+	from etracs255_caticlan.sys_usergroup_member ugm 		
+		inner join etracs255_caticlan.sys_usergroup ug on ug.objid = ugm.usergroup_objid 
 		inner join ztmp_user_admin zua on zua.objid = ugm.user_objid 
 	where ugm.usergroup_objid = 'TERMINAL.ADMIN' 
 
@@ -40,8 +40,8 @@ from (
 	select distinct 
 		ugm.objid, 'MASTER' as role, ugm.user_objid as userid, ugm.user_username as username, 
 		ugm.org_objid, ugm.org_name, ugm.securitygroup_objid, ugm.exclude, ugm.objid as uid 
-	from caticlan_go.sys_usergroup_member ugm 
-		inner join caticlan_go.sys_usergroup ug on ug.objid = ugm.usergroup_objid 
+	from etracs255_caticlan.sys_usergroup_member ugm 
+		inner join etracs255_caticlan.sys_usergroup ug on ug.objid = ugm.usergroup_objid 
 		inner join ztmp_user_collector zuc on zuc.objid = ugm.user_objid 
 	where ugm.org_orgclass = 'TERMINAL'
 		and ugm.usergroup_objid in ('TREASURY.COLLECTOR','TREASURY.SUBCOLLECTOR') 
@@ -105,9 +105,9 @@ drop table ztmp_user_collector;
 drop table ztmp_user_role;
 
 
-delete from caticlan_go.sys_usergroup_member where usergroup_objid like 'TERMINAL.%'
+delete from etracs255_caticlan.sys_usergroup_member where usergroup_objid like 'TERMINAL.%'
 ;
-delete from caticlan_go.sys_usergroup where domain='TERMINAL'
+delete from etracs255_caticlan.sys_usergroup where domain='TERMINAL'
 ;
 
 
@@ -116,7 +116,7 @@ insert ignore into sys_var (
 ) 
 select 
 	name, value, description, datatype, category 
-from caticlan_go.sys_var 
+from etracs255_caticlan.sys_var 
 where name = 'thermal_printername'
 ;
 
@@ -126,7 +126,7 @@ insert into sys_sequence (
 ) 
 select 
 	objid, nextSeries 
-from caticlan_go.sys_sequence 
+from etracs255_caticlan.sys_sequence 
 where objid like '%-aklanterminal' 
 ;
 
@@ -164,12 +164,12 @@ select
 	u.objid, u.username, u.firstname, u.lastname, u.middlename, u.name, u.jobtitle, u.txncode 
 from (
 	select distinct ugm.user_objid 
-	from caticlan_go.sys_usergroup_member ugm 
-		inner join caticlan_go.sys_usergroup ug on ug.objid = ugm.usergroup_objid 
+	from etracs255_caticlan.sys_usergroup_member ugm 
+		inner join etracs255_caticlan.sys_usergroup ug on ug.objid = ugm.usergroup_objid 
 		inner join terminal t on t.objid = ugm.org_objid 
 	where ugm.org_orgclass = 'TERMINAL'
 		and ugm.usergroup_objid in ('TREASURY.COLLECTOR','TREASURY.SUBCOLLECTOR') 
-)t0, caticlan_go.sys_user u 
+)t0, etracs255_caticlan.sys_user u 
 where u.objid = t0.user_objid 
 ;
 
@@ -183,8 +183,8 @@ select
 from ( 
 	select distinct 
 		'MASTER' as role, ugm.user_objid as userid, ugm.user_username as username, ugm.org_objid, ugm.org_name 
-	from caticlan_go.sys_usergroup_member ugm 
-		inner join caticlan_go.sys_usergroup ug on ug.objid = ugm.usergroup_objid 
+	from etracs255_caticlan.sys_usergroup_member ugm 
+		inner join etracs255_caticlan.sys_usergroup ug on ug.objid = ugm.usergroup_objid 
 		inner join terminal t on t.objid = ugm.org_objid 
 	where ugm.org_orgclass = 'TERMINAL'
 		and ugm.usergroup_objid in ('TREASURY.COLLECTOR','TREASURY.SUBCOLLECTOR') 
@@ -200,8 +200,8 @@ from (
 	select distinct 
 		cto.org_objid as objid, 'ACTIVE' as state, cto.org_name as name, 
 		'Cagban Jetty Port Terminal, Aklan' as address 
-	from cagban_go.collectiontype ct
-		inner join cagban_go.collectiontype_org cto on cto.collectiontypeid = ct.objid 
+	from etracs255_caticlan.collectiontype ct
+		inner join etracs255_caticlan.collectiontype_org cto on cto.collectiontypeid = ct.objid 
 	where ct.handler = 'ticketing' 
 )t0 
 order by objid
@@ -224,8 +224,8 @@ create table ztmp_route
 select distinct 
 	cto.org_objid as objid, 'ACTIVE' as state, cto.org_name as name, 
 	0 as sortorder, cto.org_objid as originid, null as destinationid 
-from caticlan_go.collectiontype ct
-	inner join caticlan_go.collectiontype_org cto on cto.collectiontypeid = ct.objid 
+from etracs255_caticlan.collectiontype ct
+	inner join etracs255_caticlan.collectiontype_org cto on cto.collectiontypeid = ct.objid 
 	inner join terminal t on t.objid = cto.org_objid 
 where ct.handler = 'ticketing' 
 order by cto.org_objid 
@@ -264,7 +264,7 @@ from (
 		CONCAT('UR-',MD5(CONCAT( ur.role, u.objid, t.objid ))) as uid, 
 		'COLLECTOR' as role, u.objid as userid, u.username, 
 		t.objid as org_objid, t.name as org_name  
-	from caticlan_go.sys_usergroup_member ugm 
+	from etracs255_caticlan.sys_usergroup_member ugm 
 		inner join (select 'COLLECTOR' as role) ur 
 		inner join sys_user u on u.objid = ugm.user_objid 
 		inner join terminal t on t.objid = ugm.org_objid 
