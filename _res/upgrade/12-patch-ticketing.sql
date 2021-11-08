@@ -277,11 +277,3 @@ where (
 		and org_objid = t0.org_objid 
 ) = 0 
 ;
-
-
-
-INSERT INTO terminal (objid, state, name, address) VALUES ('038CAG', 'ACTIVE', 'CAGBAN JETTY PORT TERMINAL', 'CAGBAN JETTY PORT TERMINAL, AKLAN');
-INSERT INTO terminal (objid, state, name, address) VALUES ('038CAT', 'ACTIVE', 'CATICLAN JETTY PORT TERMINAL', 'CATICLAN JETTY PORT TERMINAL, AKLAN');
-
-INSERT INTO route (objid, state, name, sortorder, originid, destinationid) VALUES ('ROUTE290d16d3:17ba01919c0:-7ef0', 'ACTIVE', 'CATICLAN - CAGBAN', '0', '038CAT', '038CAG');
-INSERT INTO route (objid, state, name, sortorder, originid, destinationid) VALUES ('ROUTE5e26f8cc:17ba02c32c0:-7f77', 'ACTIVE', 'CAGBAN - CATICLAN', '1', '038CAG', '038CAT');
