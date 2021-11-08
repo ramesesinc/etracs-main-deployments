@@ -86,148 +86,148 @@ insert into barangay
 select * from cagban_go.barangay
 ; 
 
-insert into batchcapture_collection 
-select * 
-from cagban_go.batchcapture_collection
-where txndate >= '2021-01-01' 
-; 
+-- insert into batchcapture_collection 
+-- select * 
+-- from cagban_go.batchcapture_collection
+-- where txndate >= '2021-01-01' 
+-- ; 
 
-insert into batchcapture_collection_entry 
-select ce.* 
-from cagban_go.batchcapture_collection c 
-	inner join cagban_go.batchcapture_collection_entry ce on ce.parentid = c.objid 
-where c.txndate >= '2021-01-01' 
-; 
+-- insert into batchcapture_collection_entry 
+-- select ce.* 
+-- from cagban_go.batchcapture_collection c 
+-- 	inner join cagban_go.batchcapture_collection_entry ce on ce.parentid = c.objid 
+-- where c.txndate >= '2021-01-01' 
+-- ; 
 
-insert into batchcapture_collection_entry_item 
-select cei.* 
-from cagban_go.batchcapture_collection c 
-	inner join cagban_go.batchcapture_collection_entry ce on ce.parentid = c.objid 
-	inner join cagban_go.batchcapture_collection_entry_item cei on cei.parentid = ce.objid 
-where c.txndate >= '2021-01-01' 
-; 
+-- insert into batchcapture_collection_entry_item 
+-- select cei.* 
+-- from cagban_go.batchcapture_collection c 
+-- 	inner join cagban_go.batchcapture_collection_entry ce on ce.parentid = c.objid 
+-- 	inner join cagban_go.batchcapture_collection_entry_item cei on cei.parentid = ce.objid 
+-- where c.txndate >= '2021-01-01' 
+-- ; 
 
 insert into billitem_txntype 
 select * from cagban_go.billitem_txntype
 ; 
 
-insert into brgyshare_account_mapping 
-select * from cagban_go.brgyshare_account_mapping
-; 
+-- insert into brgyshare_account_mapping 
+-- select * from cagban_go.brgyshare_account_mapping
+-- ; 
 
 
-create table cagban_go.ztmp_cashreceipt 
-select * 
-from ( 
-	select c.objid  
-	from cagban_go.cashreceipt c
-	where c.receiptdate >= '2021-01-01' 
-	union 
-	select rc.objid  
-	from cagban_go.remittance r 
-		inner join cagban_go.remittance_cashreceipt rc on rc.remittanceid = r.objid 
-	where r.dtposted >= '2021-01-01' 
-	union 
-	select rc.objid  
-	from cagban_go.liquidation l 
-		inner join cagban_go.liquidation_remittance lr on lr.liquidationid = l.objid 
-		inner join cagban_go.remittance r on r.objid = lr.objid 
-		inner join cagban_go.remittance_cashreceipt rc on rc.remittanceid = r.objid 
-	where l.dtposted >= '2021-01-01' 
-	union 
-	select rc.objid 
-	from ( 
-		select distinct lcf.liquidationid 
-		from cagban_go.bankdeposit bd
-			inner join cagban_go.bankdeposit_liquidation bdl on bdl.bankdepositid = bd.objid 
-			inner join cagban_go.liquidation_cashier_fund lcf on lcf.objid = bdl.objid 
-		where bd.dtposted >= '2021-01-01' 
-	)t0 
-		inner join cagban_go.liquidation_remittance lr on lr.liquidationid = t0.liquidationid 
-		inner join cagban_go.remittance r on r.objid = lr.objid 
-		inner join cagban_go.remittance_cashreceipt rc on rc.remittanceid = r.objid 
-)t1
-; 
-create index ix_objid on cagban_go.ztmp_cashreceipt (objid)
-; 
+-- create table cagban_go.ztmp_cashreceipt 
+-- select * 
+-- from ( 
+-- 	select c.objid  
+-- 	from cagban_go.cashreceipt c
+-- 	where c.receiptdate >= '2021-01-01' 
+-- 	union 
+-- 	select rc.objid  
+-- 	from cagban_go.remittance r 
+-- 		inner join cagban_go.remittance_cashreceipt rc on rc.remittanceid = r.objid 
+-- 	where r.dtposted >= '2021-01-01' 
+-- 	union 
+-- 	select rc.objid  
+-- 	from cagban_go.liquidation l 
+-- 		inner join cagban_go.liquidation_remittance lr on lr.liquidationid = l.objid 
+-- 		inner join cagban_go.remittance r on r.objid = lr.objid 
+-- 		inner join cagban_go.remittance_cashreceipt rc on rc.remittanceid = r.objid 
+-- 	where l.dtposted >= '2021-01-01' 
+-- 	union 
+-- 	select rc.objid 
+-- 	from ( 
+-- 		select distinct lcf.liquidationid 
+-- 		from cagban_go.bankdeposit bd
+-- 			inner join cagban_go.bankdeposit_liquidation bdl on bdl.bankdepositid = bd.objid 
+-- 			inner join cagban_go.liquidation_cashier_fund lcf on lcf.objid = bdl.objid 
+-- 		where bd.dtposted >= '2021-01-01' 
+-- 	)t0 
+-- 		inner join cagban_go.liquidation_remittance lr on lr.liquidationid = t0.liquidationid 
+-- 		inner join cagban_go.remittance r on r.objid = lr.objid 
+-- 		inner join cagban_go.remittance_cashreceipt rc on rc.remittanceid = r.objid 
+-- )t1
+-- ; 
+-- create index ix_objid on cagban_go.ztmp_cashreceipt (objid)
+-- ; 
 
-insert into cashreceipt 
-select c.* 
-from cagban_go.ztmp_cashreceipt z 
-	inner join cagban_go.cashreceipt c on c.objid = z.objid 
-; 
+-- insert into cashreceipt 
+-- select c.* 
+-- from cagban_go.ztmp_cashreceipt z 
+-- 	inner join cagban_go.cashreceipt c on c.objid = z.objid 
+-- ; 
 
-insert into cashreceipt_burial 
-select c.* 
-from cagban_go.ztmp_cashreceipt z 
-	inner join cagban_go.cashreceipt_burial c on c.objid = z.objid 
-; 
+-- insert into cashreceipt_burial 
+-- select c.* 
+-- from cagban_go.ztmp_cashreceipt z 
+-- 	inner join cagban_go.cashreceipt_burial c on c.objid = z.objid 
+-- ; 
 
-insert into cashreceipt_cancelseries 
-select c.* 
-from cagban_go.ztmp_cashreceipt z 
-	inner join cagban_go.cashreceipt_cancelseries c on c.receiptid = z.objid 
-; 
+-- insert into cashreceipt_cancelseries 
+-- select c.* 
+-- from cagban_go.ztmp_cashreceipt z 
+-- 	inner join cagban_go.cashreceipt_cancelseries c on c.receiptid = z.objid 
+-- ; 
 
-insert into cashreceipt_cashticket 
-select c.* 
-from cagban_go.ztmp_cashreceipt z 
-	inner join cagban_go.cashreceipt_cashticket c on c.objid = z.objid 
-; 
+-- insert into cashreceipt_cashticket 
+-- select c.* 
+-- from cagban_go.ztmp_cashreceipt z 
+-- 	inner join cagban_go.cashreceipt_cashticket c on c.objid = z.objid 
+-- ; 
 
-insert into cashreceipt_largecattleownership 
-select c.* 
-from cagban_go.ztmp_cashreceipt z 
-	inner join cagban_go.cashreceipt_largecattleownership c on c.objid = z.objid 
-;
+-- insert into cashreceipt_largecattleownership 
+-- select c.* 
+-- from cagban_go.ztmp_cashreceipt z 
+-- 	inner join cagban_go.cashreceipt_largecattleownership c on c.objid = z.objid 
+-- ;
 
-insert into cashreceipt_largecattletransfer 
-select c.* 
-from cagban_go.ztmp_cashreceipt z 
-	inner join cagban_go.cashreceipt_largecattletransfer c on c.objid = z.objid 
-; 
+-- insert into cashreceipt_largecattletransfer 
+-- select c.* 
+-- from cagban_go.ztmp_cashreceipt z 
+-- 	inner join cagban_go.cashreceipt_largecattletransfer c on c.objid = z.objid 
+-- ; 
 
-insert into cashreceipt_marriage 
-select c.* 
-from cagban_go.ztmp_cashreceipt z 
-	inner join cagban_go.cashreceipt_marriage c on c.objid = z.objid 
-; 
+-- insert into cashreceipt_marriage 
+-- select c.* 
+-- from cagban_go.ztmp_cashreceipt z 
+-- 	inner join cagban_go.cashreceipt_marriage c on c.objid = z.objid 
+-- ; 
 
-insert into cashreceipt_slaughter 
-select c.* 
-from cagban_go.ztmp_cashreceipt z 
-	inner join cagban_go.cashreceipt_slaughter c on c.objid = z.objid 
-; 
+-- insert into cashreceipt_slaughter 
+-- select c.* 
+-- from cagban_go.ztmp_cashreceipt z 
+-- 	inner join cagban_go.cashreceipt_slaughter c on c.objid = z.objid 
+-- ; 
 
-insert into cashreceipt_void 
-select c.* 
-from cagban_go.ztmp_cashreceipt z 
-	inner join cagban_go.cashreceipt_void c on c.receiptid = z.objid 
-; 
+-- insert into cashreceipt_void 
+-- select c.* 
+-- from cagban_go.ztmp_cashreceipt z 
+-- 	inner join cagban_go.cashreceipt_void c on c.receiptid = z.objid 
+-- ; 
 
-insert into cashreceiptitem 
-select c.* 
-from cagban_go.ztmp_cashreceipt z 
-	inner join cagban_go.cashreceiptitem c on c.receiptid = z.objid 
-;
+-- insert into cashreceiptitem 
+-- select c.* 
+-- from cagban_go.ztmp_cashreceipt z 
+-- 	inner join cagban_go.cashreceiptitem c on c.receiptid = z.objid 
+-- ;
 
-insert into cashreceiptitem_discount 
-select c.* 
-from cagban_go.ztmp_cashreceipt z 
-	inner join cagban_go.cashreceiptitem_discount c on c.receiptid = z.objid 
-;
+-- insert into cashreceiptitem_discount 
+-- select c.* 
+-- from cagban_go.ztmp_cashreceipt z 
+-- 	inner join cagban_go.cashreceiptitem_discount c on c.receiptid = z.objid 
+-- ;
 
-insert into cashreceiptpayment_creditmemo 
-select c.* 
-from cagban_go.ztmp_cashreceipt z 
-	inner join cagban_go.cashreceiptpayment_creditmemo c on c.receiptid = z.objid 
-; 
+-- insert into cashreceiptpayment_creditmemo 
+-- select c.* 
+-- from cagban_go.ztmp_cashreceipt z 
+-- 	inner join cagban_go.cashreceiptpayment_creditmemo c on c.receiptid = z.objid 
+-- ; 
 
-insert into cashreceiptpayment_noncash 
-select c.* 
-from cagban_go.ztmp_cashreceipt z 
-	inner join cagban_go.cashreceiptpayment_noncash c on c.receiptid = z.objid 
-; 
+-- insert into cashreceiptpayment_noncash 
+-- select c.* 
+-- from cagban_go.ztmp_cashreceipt z 
+-- 	inner join cagban_go.cashreceiptpayment_noncash c on c.receiptid = z.objid 
+-- ; 
 
 insert into citizenship 
 select * from cagban_go.citizenship
@@ -249,13 +249,13 @@ insert into collectiontype_account
 select * from cagban_go.collectiontype_account
 ; 
 
-insert into creditmemo 
-select * from cagban_go.creditmemo
-; 
+-- insert into creditmemo 
+-- select * from cagban_go.creditmemo
+-- ; 
 
-insert into creditmemoitem 
-select * from cagban_go.creditmemoitem
-; 
+-- insert into creditmemoitem 
+-- select * from cagban_go.creditmemoitem
+-- ; 
 
 insert into creditmemotype 
 select * from cagban_go.creditmemotype
@@ -265,13 +265,13 @@ insert into creditmemotype_account
 select * from cagban_go.creditmemotype_account
 ; 
 
-insert into directcash_collection 
-select * from cagban_go.directcash_collection
-; 
+-- insert into directcash_collection 
+-- select * from cagban_go.directcash_collection
+-- ; 
 
-insert into directcash_collection_item 
-select * from cagban_go.directcash_collection_item
-; 
+-- insert into directcash_collection_item 
+-- select * from cagban_go.directcash_collection_item
+-- ; 
 
 insert into entity 
 select * from cagban_go.entity
@@ -318,63 +318,63 @@ select * from cagban_go.itemaccount_tag
 ; 
 
 
-create table cagban_go.ztmp_liquidation_remittance 
-select lr.liquidationid, lr.objid as remittanceid 
-from cagban_go.liquidation l 
-	inner join cagban_go.liquidation_remittance lr on lr.liquidationid = l.objid 
-where l.dtposted >= '2021-01-01' 
-; 
-create index ix_remittanceid on cagban_go.ztmp_liquidation_remittance (remittanceid);
-create index ix_liquidationid on cagban_go.ztmp_liquidation_remittance (liquidationid);
+-- create table cagban_go.ztmp_liquidation_remittance 
+-- select lr.liquidationid, lr.objid as remittanceid 
+-- from cagban_go.liquidation l 
+-- 	inner join cagban_go.liquidation_remittance lr on lr.liquidationid = l.objid 
+-- where l.dtposted >= '2021-01-01' 
+-- ; 
+-- create index ix_remittanceid on cagban_go.ztmp_liquidation_remittance (remittanceid);
+-- create index ix_liquidationid on cagban_go.ztmp_liquidation_remittance (liquidationid);
 
-insert into liquidation 
-select l.* 
-from ( 
-	select distinct liquidationid 
-	from cagban_go.ztmp_liquidation_remittance
-)z 
-	inner join cagban_go.liquidation l on l.objid = z.liquidationid 
-; 
+-- insert into liquidation 
+-- select l.* 
+-- from ( 
+-- 	select distinct liquidationid 
+-- 	from cagban_go.ztmp_liquidation_remittance
+-- )z 
+-- 	inner join cagban_go.liquidation l on l.objid = z.liquidationid 
+-- ; 
 
-insert into liquidation_cashier_fund 
-select lcf.* 
-from ( 
-	select distinct liquidationid 
-	from cagban_go.ztmp_liquidation_remittance
-)z 
-	inner join cagban_go.liquidation l on l.objid = z.liquidationid 
-	inner join cagban_go.liquidation_cashier_fund lcf on lcf.liquidationid = l.objid 
-; 
+-- insert into liquidation_cashier_fund 
+-- select lcf.* 
+-- from ( 
+-- 	select distinct liquidationid 
+-- 	from cagban_go.ztmp_liquidation_remittance
+-- )z 
+-- 	inner join cagban_go.liquidation l on l.objid = z.liquidationid 
+-- 	inner join cagban_go.liquidation_cashier_fund lcf on lcf.liquidationid = l.objid 
+-- ; 
 
-insert into liquidation_creditmemopayment 
-select lcm.* 
-from ( 
-	select distinct liquidationid 
-	from cagban_go.ztmp_liquidation_remittance
-)z 
-	inner join cagban_go.liquidation l on l.objid = z.liquidationid 
-	inner join cagban_go.liquidation_creditmemopayment lcm on lcm.liquidationid = l.objid 
-;
+-- insert into liquidation_creditmemopayment 
+-- select lcm.* 
+-- from ( 
+-- 	select distinct liquidationid 
+-- 	from cagban_go.ztmp_liquidation_remittance
+-- )z 
+-- 	inner join cagban_go.liquidation l on l.objid = z.liquidationid 
+-- 	inner join cagban_go.liquidation_creditmemopayment lcm on lcm.liquidationid = l.objid 
+-- ;
 
-insert into liquidation_noncashpayment 
-select lcm.* 
-from ( 
-	select distinct liquidationid 
-	from cagban_go.ztmp_liquidation_remittance
-)z 
-	inner join cagban_go.liquidation l on l.objid = z.liquidationid 
-	inner join cagban_go.liquidation_noncashpayment lcm on lcm.liquidationid = l.objid 
-;
+-- insert into liquidation_noncashpayment 
+-- select lcm.* 
+-- from ( 
+-- 	select distinct liquidationid 
+-- 	from cagban_go.ztmp_liquidation_remittance
+-- )z 
+-- 	inner join cagban_go.liquidation l on l.objid = z.liquidationid 
+-- 	inner join cagban_go.liquidation_noncashpayment lcm on lcm.liquidationid = l.objid 
+-- ;
 
-insert into liquidation_remittance 
-select lr.* 
-from ( 
-	select distinct liquidationid 
-	from cagban_go.ztmp_liquidation_remittance
-)z 
-	inner join cagban_go.liquidation l on l.objid = z.liquidationid 
-	inner join cagban_go.liquidation_remittance lr on lr.liquidationid = l.objid 
-;
+-- insert into liquidation_remittance 
+-- select lr.* 
+-- from ( 
+-- 	select distinct liquidationid 
+-- 	from cagban_go.ztmp_liquidation_remittance
+-- )z 
+-- 	inner join cagban_go.liquidation l on l.objid = z.liquidationid 
+-- 	inner join cagban_go.liquidation_remittance lr on lr.liquidationid = l.objid 
+-- ;
 
 insert into profession 
 select * from cagban_go.profession
@@ -388,64 +388,64 @@ insert into religion
 select * from cagban_go.religion
 ; 
 
-insert into remittance 
-select r.* 
-from ( 
-	select distinct remittanceid  
-	from cagban_go.ztmp_liquidation_remittance
-)z 
-	inner join cagban_go.remittance r on r.objid = z.remittanceid 
-; 
+-- insert into remittance 
+-- select r.* 
+-- from ( 
+-- 	select distinct remittanceid  
+-- 	from cagban_go.ztmp_liquidation_remittance
+-- )z 
+-- 	inner join cagban_go.remittance r on r.objid = z.remittanceid 
+-- ; 
 
-insert into remittance_af 
-select ra.* 
-from ( 
-	select distinct remittanceid  
-	from cagban_go.ztmp_liquidation_remittance
-)z 
-	inner join cagban_go.remittance r on r.objid = z.remittanceid 
-	inner join cagban_go.remittance_af ra on ra.remittanceid = r.objid 
-; 
+-- insert into remittance_af 
+-- select ra.* 
+-- from ( 
+-- 	select distinct remittanceid  
+-- 	from cagban_go.ztmp_liquidation_remittance
+-- )z 
+-- 	inner join cagban_go.remittance r on r.objid = z.remittanceid 
+-- 	inner join cagban_go.remittance_af ra on ra.remittanceid = r.objid 
+-- ; 
 
-insert into remittance_cashreceipt 
-select ra.* 
-from ( 
-	select distinct remittanceid  
-	from cagban_go.ztmp_liquidation_remittance
-)z 
-	inner join cagban_go.remittance r on r.objid = z.remittanceid 
-	inner join cagban_go.remittance_cashreceipt ra on ra.remittanceid = r.objid 
-;
+-- insert into remittance_cashreceipt 
+-- select ra.* 
+-- from ( 
+-- 	select distinct remittanceid  
+-- 	from cagban_go.ztmp_liquidation_remittance
+-- )z 
+-- 	inner join cagban_go.remittance r on r.objid = z.remittanceid 
+-- 	inner join cagban_go.remittance_cashreceipt ra on ra.remittanceid = r.objid 
+-- ;
 
-insert into remittance_creditmemopayment 
-select ra.* 
-from ( 
-	select distinct remittanceid  
-	from cagban_go.ztmp_liquidation_remittance
-)z 
-	inner join cagban_go.remittance r on r.objid = z.remittanceid 
-	inner join cagban_go.remittance_creditmemopayment ra on ra.remittanceid = r.objid 
-;
+-- insert into remittance_creditmemopayment 
+-- select ra.* 
+-- from ( 
+-- 	select distinct remittanceid  
+-- 	from cagban_go.ztmp_liquidation_remittance
+-- )z 
+-- 	inner join cagban_go.remittance r on r.objid = z.remittanceid 
+-- 	inner join cagban_go.remittance_creditmemopayment ra on ra.remittanceid = r.objid 
+-- ;
 
-insert into remittance_fund 
-select ra.* 
-from ( 
-	select distinct remittanceid  
-	from cagban_go.ztmp_liquidation_remittance
-)z 
-	inner join cagban_go.remittance r on r.objid = z.remittanceid 
-	inner join cagban_go.remittance_fund ra on ra.remittanceid = r.objid 
-;
+-- insert into remittance_fund 
+-- select ra.* 
+-- from ( 
+-- 	select distinct remittanceid  
+-- 	from cagban_go.ztmp_liquidation_remittance
+-- )z 
+-- 	inner join cagban_go.remittance r on r.objid = z.remittanceid 
+-- 	inner join cagban_go.remittance_fund ra on ra.remittanceid = r.objid 
+-- ;
 
-insert into remittance_noncashpayment 
-select ra.* 
-from ( 
-	select distinct remittanceid  
-	from cagban_go.ztmp_liquidation_remittance
-)z 
-	inner join cagban_go.remittance r on r.objid = z.remittanceid 
-	inner join cagban_go.remittance_noncashpayment ra on ra.remittanceid = r.objid 
-;
+-- insert into remittance_noncashpayment 
+-- select ra.* 
+-- from ( 
+-- 	select distinct remittanceid  
+-- 	from cagban_go.ztmp_liquidation_remittance
+-- )z 
+-- 	inner join cagban_go.remittance r on r.objid = z.remittanceid 
+-- 	inner join cagban_go.remittance_noncashpayment ra on ra.remittanceid = r.objid 
+-- ;
 
 insert into requirement_type 
 select * from cagban_go.requirement_type
@@ -495,18 +495,18 @@ insert into stocksaleitem
 select * from cagban_go.stocksaleitem
 ; 
 
-insert into subcollector_remittance 
-select r.* 
-from cagban_go.subcollector_remittance r 
-where r.dtposted >= '2021-01-01' 
-; 
+-- insert into subcollector_remittance 
+-- select r.* 
+-- from cagban_go.subcollector_remittance r 
+-- where r.dtposted >= '2021-01-01' 
+-- ; 
 
-insert into subcollector_remittance_cashreceipt 
-select rc.* 
-from cagban_go.subcollector_remittance r 
-	inner join cagban_go.subcollector_remittance_cashreceipt rc on rc.remittanceid = r.objid 
-where r.dtposted >= '2021-01-01' 
-;
+-- insert into subcollector_remittance_cashreceipt 
+-- select rc.* 
+-- from cagban_go.subcollector_remittance r 
+-- 	inner join cagban_go.subcollector_remittance_cashreceipt rc on rc.remittanceid = r.objid 
+-- where r.dtposted >= '2021-01-01' 
+-- ;
 
 insert into sys_dataset 
 select * from cagban_go.sys_dataset
@@ -616,17 +616,17 @@ insert into sys_sequence
 select * from cagban_go.sys_sequence
 ; 
 
-insert into sys_session 
-select r.* 
-from cagban_go.sys_session r 
-where r.timein >= '2021-01-01' 
-;
+-- insert into sys_session 
+-- select r.* 
+-- from cagban_go.sys_session r 
+-- where r.timein >= '2021-01-01' 
+-- ;
 
-insert into sys_session_log 
-select r.* 
-from cagban_go.sys_session_log r 
-where r.timeout >= '2021-01-01' 
-;
+-- insert into sys_session_log 
+-- select r.* 
+-- from cagban_go.sys_session_log r 
+-- where r.timeout >= '2021-01-01' 
+-- ;
 
 insert into sys_terminal 
 select * from cagban_go.sys_terminal
@@ -684,11 +684,11 @@ insert into sys_wf_workitemtype
 select * from cagban_go.sys_wf_workitemtype
 ; 
 
-insert into txnlog 
-select r.* 
-from cagban_go.txnlog r 
-where r.txndate >= '2021-01-01' 
-; 
+-- insert into txnlog 
+-- select r.* 
+-- from cagban_go.txnlog r 
+-- where r.txndate >= '2021-01-01' 
+-- ; 
 
 insert into variableinfo 
 select * from cagban_go.variableinfo
