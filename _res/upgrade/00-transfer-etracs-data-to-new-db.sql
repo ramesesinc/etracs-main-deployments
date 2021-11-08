@@ -66,21 +66,21 @@ insert into bankaccount_entry
 select * from cagban_go.bankaccount_entry
 ; 
 
-insert into bankdeposit 
-select * from cagban_go.bankdeposit
-; 
+-- insert into bankdeposit 
+-- select * from cagban_go.bankdeposit
+-- ; 
 
-insert into bankdeposit_entry 
-select * from cagban_go.bankdeposit_entry
-; 
+-- insert into bankdeposit_entry 
+-- select * from cagban_go.bankdeposit_entry
+-- ; 
 
-insert into bankdeposit_entry_check 
-select * from cagban_go.bankdeposit_entry_check
-; 
+-- insert into bankdeposit_entry_check 
+-- select * from cagban_go.bankdeposit_entry_check
+-- ; 
 
-insert into bankdeposit_liquidation 
-select * from cagban_go.bankdeposit_liquidation
-; 
+-- insert into bankdeposit_liquidation 
+-- select * from cagban_go.bankdeposit_liquidation
+-- ; 
 
 insert into barangay 
 select * from cagban_go.barangay
