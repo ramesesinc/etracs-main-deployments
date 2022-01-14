@@ -21,8 +21,8 @@ services:
       - "8061:8061"
       - "8070:8070"
     volumes:
-      - ./modules:/apps/etracs25/modules
       - ./emptydir:/apps/notification
+      - ./modules:/apps/etracs25/modules
 
       - ../../_custom/datasources:/services/datasources
       - ../../_res/connections:/apps/etracs25/connections/ext
@@ -30,3 +30,6 @@ services:
 
       - ../../_custom/output:/apps/server/output
       - ../../_custom/fileserver:/fileserver
+
+      - ./client/reports:/apps/server/templates
+      - ../../_custom/module-client/etracs:/apps/server/templates/custom
