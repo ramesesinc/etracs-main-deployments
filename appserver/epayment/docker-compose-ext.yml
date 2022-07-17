@@ -4,4 +4,4 @@ services:
 
    epayment-server:
       volumes:
-         - ./server:/enterprise/modules
+         - ./lib/rameses-common2.jar:/apps/server/lib/rameses-common2.jar

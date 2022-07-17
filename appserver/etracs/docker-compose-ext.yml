@@ -7,3 +7,9 @@ services:
          ## this is only a seed mapping, please do not remove
          ## 
          - ../../_custom/.emptydir:/.emptydir
+
+         ## mounted updates
+         ## 
+         - ./dev_modules/admin:/services/modules/admin
+         - ./dev_modules/jasper:/services/modules/jasper
+         - ./dev_modules/treasury:/services/modules/treasury

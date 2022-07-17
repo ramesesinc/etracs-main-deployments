@@ -33,3 +33,5 @@ services:
 
       - ./client/reports:/apps/server/templates
       - ../../_custom/module-client/etracs:/apps/server/templates/custom
+
+      - ../../_custom/report-files/enterprise:/report-files
