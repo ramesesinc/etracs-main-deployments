@@ -41,11 +41,15 @@ public class CashReceiptBarcodeService {
 
 		def result = [:];
 		def bc = barcodeLauncherEm.find( [objid: barcodekey] ).first();
-		if ( !bc ) throw new Exception("barcode launcher " + map.barcodekey + " not found");
+		if ( !bc ) throw new Exception("barcode launcher " + barcodekey + " not found");
 
-		if( bc.paymentorder == 0 ) {
+
+		if ( bc.paymentorder == null ) bc.paymentorder = 0;
+
+	 	if ( bc.paymentorder == 0 ) {
 			result.refno = refno;
 			result.barcodeid = refno;
+			result.barcodekey = barcodekey;
 			result.collectiontype = bc.collectiontype;
 		}
 		else {
