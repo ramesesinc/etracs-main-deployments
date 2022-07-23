@@ -204,3 +204,60 @@ VALUES ('GENERAL', 'GENERAL', 'GEN_COL', 'GENERAL_COLLECTION', NULL);
 
 INSERT INTO sys_usergroup (objid, title, domain, userclass, orgclass, role) 
 VALUES ('TREASURY.PO_MASTER', 'TREASURY PO MASTER', 'TREASURY', 'usergroup', NULL, 'PO_MASTER');
+
+
+update 
+  collectiontype aa, 
+  ( 
+    select ct.objid, p.connection, p.servicename 
+    from collectiontype ct 
+      inner join cashreceipt_plugin p on p.objid = ct.handler 
+    where ct.servicename is null 
+  )bb 
+set
+  aa.connection = bb.connection, 
+  aa.servicename = bb.servicename 
+where 
+  aa.objid = bb.objid
+;
+
+drop table cashreceipt_plugin
+;
+
+
+
+update collectiontype set barcodekey=null where trim(barcodekey) = ''
+;
+
+insert into barcode_launcher (
+  objid, collectiontypeid, title, paymentorder, `connection`
+)
+select 
+  t1.barcodekey as objid, t1.collectiontypeid, ct.title, 
+  0 as paymentorder, null as `connection`
+from ( 
+  select t0.*, 
+    (
+      select objid from collectiontype 
+      where barcodekey = t0.barcodekey 
+        and state = 'ACTIVE' 
+      order by name limit 1 
+    ) as collectiontypeid 
+  from ( 
+    select distinct barcodekey 
+    from collectiontype 
+    where barcodekey IS NOT NULL
+      and state = 'ACTIVE' 
+  )t0 
+)t1, collectiontype ct 
+where ct.objid = t1.collectiontypeid 
+  and (select count(*) from barcode_launcher where objid = t1.barcodekey) = 0 
+;
+
+update collectiontype set barcodekey = null
+; 
+
+update barcode_launcher set paymentorder=0 where paymentorder is null 
+;
+alter table barcode_launcher modify paymentorder int not null default '0'
+;
