@@ -31,4 +31,4 @@ services:
 
       - ../../_custom/report-files/ticketing:/report-files
 
-      - ./lib/rameses-common2.jar:/apps/server/lib/rameses-common2.jar
+      - ./dev/lib/rameses-common2.jar:/apps/server/lib/rameses-common2.jar
